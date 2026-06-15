@@ -1,27 +1,41 @@
 import 'package:flutter/material.dart';
-import '../screens/login_screen.dart';
-import '../screens/home_screen.dart';
 
-/// Centralized route names and route generation for the app.
+import '../models/category.dart';
+import '../models/department.dart';
+import '../screens/category_screen.dart';
+import '../screens/home_screen.dart';
+import '../screens/item_screen.dart';
+import '../screens/login_screen.dart';
+
 class AppRoutes {
   AppRoutes._();
 
   static const String login = '/login';
   static const String home = '/home';
+  static const String categories = '/categories';
+  static const String items = '/items';
 
-  /// The route the app starts on.
   static const String initialRoute = login;
 
-  /// Generates routes based on the requested [settings.name].
-  ///
-  /// Used as the `onGenerateRoute` callback of [MaterialApp], so all
-  /// navigation goes through `Navigator.pushNamed(context, AppRoutes.xxx)`.
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case login:
         return _buildRoute(const LoginScreen(), settings);
+
       case home:
         return _buildRoute(const HomeScreen(), settings);
+
+      case categories:
+        final department = settings.arguments as Department;
+        return _buildRoute(
+          CategoryScreen(department: department),
+          settings,
+        );
+
+      case items:
+        final category = settings.arguments as Category;
+        return _buildRoute(ItemScreen(category: category), settings);
+
       default:
         return _buildRoute(
           Scaffold(
@@ -46,7 +60,8 @@ class AppRoutes {
             position: Tween<Offset>(
               begin: const Offset(0, 0.03),
               end: Offset.zero,
-            ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+            ).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeOut)),
             child: child,
           ),
         );

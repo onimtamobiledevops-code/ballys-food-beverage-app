@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../providers/menu_data_provider.dart';
 import '../routes/app_routes.dart';
 import '../theme/app_theme.dart';
 
@@ -32,6 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final success = await authProvider.login(_passwordController.text);
 
     if (success && mounted) {
+      // Trigger all menu data loading in background after login
+      context.read<MenuDataProvider>().loadAll();
       Navigator.pushReplacementNamed(context, AppRoutes.home);
     }
   }
@@ -67,14 +70,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Text(
                     'Enter your password to continue',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.greyText,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.greyText, fontSize: 14),
                   ),
                   const SizedBox(height: 40),
 
-                  // Password field
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -90,39 +89,31 @@ class _LoginScreenState extends State<LoginScreen> {
                               : Icons.visibility_off_outlined,
                           color: AppColors.greyText,
                         ),
-                        onPressed: () {
-                          setState(() => _obscurePassword = !_obscurePassword);
-                        },
+                        onPressed: () =>
+                            setState(() => _obscurePassword = !_obscurePassword),
                       ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Password is required';
                       }
-                      if (value.length < 4) {
-                        return 'Minimum 4 characters';
-                      }
+                      if (value.length < 4) return 'Minimum 4 characters';
                       return null;
                     },
                   ),
 
-                  // Error message
                   if (authProvider.errorMessage != null) ...[
                     const SizedBox(height: 12),
                     Text(
                       authProvider.errorMessage!,
                       style: const TextStyle(
-                        color: AppColors.primaryRed,
-                        fontSize: 13,
-                      ),
+                          color: AppColors.primaryRed, fontSize: 13),
                       textAlign: TextAlign.center,
                     ),
                   ],
 
                   const SizedBox(height: 24),
-
                   _buildLoginButton(authProvider),
-
                   const SizedBox(height: 24),
                 ],
               ),
@@ -149,11 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ],
         ),
-        child: const Icon(
-          Icons.restaurant,
-          color: Colors.white,
-          size: 42,
-        ),
+        child: const Icon(Icons.restaurant, color: Colors.white, size: 42),
       ),
     );
   }
@@ -178,7 +165,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 24,
                     child: CircularProgressIndicator(
                       strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
                 : const Text(

@@ -3,10 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../../models/department.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/department_provider.dart';
+import '../../providers/menu_data_provider.dart'; // ← changed
 import '../../theme/app_theme.dart';
 
-/// Home tab — shows a greeting, search bar, and department grid loaded from API.
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
 
@@ -21,9 +20,12 @@ class _HomeTabState extends State<HomeTab> {
   @override
   void initState() {
     super.initState();
-    // Fetch departments on first build
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DepartmentProvider>().fetchDepartments();
+      // Only load if not already loaded
+      final menuData = context.read<MenuDataProvider>();
+      if (menuData.status == MenuDataStatus.idle) {
+        menuData.loadAll(); // ← changed
+      }
     });
   }
 
@@ -36,20 +38,17 @@ class _HomeTabState extends State<HomeTab> {
   List<Department> _filtered(List<Department> all) {
     if (_searchQuery.isEmpty) return all;
     final q = _searchQuery.toLowerCase();
-    return all
-        .where((d) => d.deptName.toLowerCase().contains(q))
-        .toList();
+    return all.where((d) => d.deptName.toLowerCase().contains(q)).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser;
-    final deptProvider = context.watch<DepartmentProvider>();
+    final menuData = context.watch<MenuDataProvider>(); // ← changed
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Header ────────────────────────────────────────────────────────
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
           child: Column(
@@ -69,8 +68,6 @@ class _HomeTabState extends State<HomeTab> {
                 style: TextStyle(color: AppColors.greyText, fontSize: 13),
               ),
               const SizedBox(height: 18),
-
-              // ── Search bar ─────────────────────────────────────────────
               TextField(
                 controller: _searchController,
                 style: const TextStyle(color: Colors.white),
@@ -78,10 +75,12 @@ class _HomeTabState extends State<HomeTab> {
                 decoration: InputDecoration(
                   hintText: 'Search departments...',
                   hintStyle: const TextStyle(color: AppColors.greyText),
-                  prefixIcon: const Icon(Icons.search, color: AppColors.greyText),
+                  prefixIcon:
+                      const Icon(Icons.search, color: AppColors.greyText),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.close, color: AppColors.greyText),
+                          icon: const Icon(Icons.close,
+                              color: AppColors.greyText),
                           onPressed: () {
                             _searchController.clear();
                             setState(() => _searchQuery = '');
@@ -98,7 +97,6 @@ class _HomeTabState extends State<HomeTab> {
                 ),
               ),
               const SizedBox(height: 20),
-
               const Text(
                 'Departments',
                 style: TextStyle(
@@ -111,21 +109,19 @@ class _HomeTabState extends State<HomeTab> {
             ],
           ),
         ),
-
-        // ── Body ──────────────────────────────────────────────────────────
-        Expanded(child: _buildBody(deptProvider)),
+        Expanded(child: _buildBody(menuData)), // ← changed
       ],
     );
   }
 
-  Widget _buildBody(DepartmentProvider provider) {
+  Widget _buildBody(MenuDataProvider provider) { // ← changed
     switch (provider.status) {
-      case DepartmentStatus.loading:
+      case MenuDataStatus.loading: // ← changed
         return const Center(
           child: CircularProgressIndicator(color: AppColors.primaryOrange),
         );
 
-      case DepartmentStatus.error:
+      case MenuDataStatus.error: // ← changed
         return Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
@@ -142,7 +138,7 @@ class _HomeTabState extends State<HomeTab> {
                 ),
                 const SizedBox(height: 20),
                 OutlinedButton.icon(
-                  onPressed: provider.fetchDepartments,
+                  onPressed: provider.loadAll, // ← changed
                   icon: const Icon(Icons.refresh),
                   label: const Text('Retry'),
                   style: OutlinedButton.styleFrom(
@@ -155,7 +151,7 @@ class _HomeTabState extends State<HomeTab> {
           ),
         );
 
-      case DepartmentStatus.loaded:
+      case MenuDataStatus.loaded: // ← changed
         final items = _filtered(provider.departments);
         if (items.isEmpty) {
           return Center(
@@ -184,13 +180,12 @@ class _HomeTabState extends State<HomeTab> {
   }
 }
 
-// ── Department card ──────────────────────────────────────────────────────────
+// ── Department card (unchanged) ──────────────────────────────────────────────
 
 class _DepartmentCard extends StatelessWidget {
   final Department dept;
   const _DepartmentCard({required this.dept});
 
-  /// Pick a distinct icon per department name (fallback to store icon).
   IconData _icon() {
     final name = dept.deptName.toLowerCase();
     if (name.contains('beverage') || name.contains('drink')) {
@@ -214,14 +209,7 @@ class _DepartmentCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () {
-          // TODO: navigate to department items
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Opened ${dept.deptName}'),
-              backgroundColor: AppColors.surfaceBlackLight,
-              duration: const Duration(seconds: 1),
-            ),
-          );
+          Navigator.pushNamed(context, '/categories', arguments: dept);
         },
         child: Padding(
           padding: const EdgeInsets.all(16),
