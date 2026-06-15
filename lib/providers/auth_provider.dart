@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import '../models/user_model.dart';
 
-/// Handles authentication state for the app using the Provider pattern.
-///
-/// This is a mock implementation (no real backend). Replace [login] with
-/// an actual API call when integrating with a real authentication service.
+import '../models/user_model.dart';
+import '../services/api_service.dart';
+import '../services/device_service.dart';
+
 class AuthProvider extends ChangeNotifier {
+  final ApiService _apiService;
+
+  AuthProvider(this._apiService);
+
   bool _isLoading = false;
   bool _isLoggedIn = false;
   String? _errorMessage;
@@ -16,52 +19,95 @@ class AuthProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   UserModel? get currentUser => _currentUser;
 
-  /// Attempts to log the user in with the given [email] and [password].
-  ///
-  /// Returns `true` on success, `false` on failure. Sets [errorMessage]
-  /// when authentication fails.
-  Future<bool> login(String email, String password) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+  Future<bool> login(String password) async {
+    _setLoading(true);
 
-    // Simulate network/auth delay.
-    await Future.delayed(const Duration(milliseconds: 1200));
+    try {
+      final deviceId = await DeviceService.getDeviceId();
 
-    // Simple mock validation - replace with real authentication logic.
-    if (email.trim().isEmpty || password.trim().isEmpty) {
-      _errorMessage = 'Please enter both email and password.';
+      // Step 1 — login
+      final loginRes = await _apiService.post('CommonExecute', {
+        "HasReturnData": "T",
+        "Parameters": [
+          {
+            "Para_Data": "1",
+            "Para_Direction": "Input",
+            "Para_Lenth": 1,
+            "Para_Name": "@Iid",
+            "Para_Type": "int",
+          },
+          {
+            "Para_Data": password.trim(),
+            "Para_Direction": "Input",
+            "Para_Lenth": 100,
+            "Para_Name": "@Text2",
+            "Para_Type": "varchar",
+          },
+          {
+            "Para_Data": deviceId,
+            "Para_Direction": "Input",
+            "Para_Lenth": 100,
+            "Para_Name": "@Text3",
+            "Para_Type": "varchar",
+          },
+        ],
+        "SpName": "sp_Android_Common_API",
+        "con": "1",
+      });
+
+      final loginRow = _firstRow(loginRes);
+      if (loginRow == null) return _fail('Unexpected response from server.');
+      if ((loginRow['ReturnMSG'] as String?) != 'T') {
+        return _fail('Incorrect password. Please try again.');
+      }
+
+      final empName = loginRow['Emp_Name'] as String? ?? '';
+      final secLevel = (loginRow['Sec_Lvl'] as num?)?.toInt() ?? 0;
+
+      // Step 2 — device check
+      final deviceRes = await _apiService.post('CommonExecute', {
+        "HasReturnData": "T",
+        "Parameters": [
+          {
+            "Para_Data": "2",
+            "Para_Direction": "Input",
+            "Para_Lenth": 1,
+            "Para_Name": "@Iid",
+            "Para_Type": "int",
+          },
+          {
+            "Para_Data": "e3010a59df78cdae",
+            "Para_Direction": "Input",
+            "Para_Lenth": 100,
+            "Para_Name": "@Text1",
+            "Para_Type": "varchar",
+          },
+        ],
+        "SpName": "sp_Android_Common_API",
+        "con": "1",
+      });
+
+      final deviceRow = _firstRow(deviceRes);
+      if (deviceRow == null) return _fail('Device verification failed.');
+      if ((deviceRow['CheckDeviceID'] as String?) != 'T') {
+        return _fail('This device is not registered. Please contact support.');
+      }
+
+      _currentUser = UserModel(
+        name: empName,
+        secLevel: secLevel,
+        deviceId: (deviceRow['Device_Id'] as num?)?.toInt() ?? 0,
+        docNo: deviceRow['Doc_No']?.toString() ?? '',
+      );
+      _isLoggedIn = true;
       _isLoading = false;
       notifyListeners();
-      return false;
+      return true;
+    } catch (e) {
+      return _fail('Connection error: ${e.toString()}');
     }
-
-    if (!email.contains('@')) {
-      _errorMessage = 'Please enter a valid email address.';
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-
-    if (password.length < 4) {
-      _errorMessage = 'Password must be at least 4 characters.';
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-
-    // Mock successful login.
-    _currentUser = UserModel(
-      name: email.split('@').first,
-      email: email.trim(),
-    );
-    _isLoggedIn = true;
-    _isLoading = false;
-    notifyListeners();
-    return true;
   }
 
-  /// Logs the current user out and resets the auth state.
   void logout() {
     _isLoggedIn = false;
     _currentUser = null;
@@ -69,11 +115,35 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Clears any existing error message (e.g. when the user edits a field).
   void clearError() {
     if (_errorMessage != null) {
       _errorMessage = null;
       notifyListeners();
+    }
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  bool _fail(String message) {
+    _errorMessage = message;
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  }
+
+  Map<String, dynamic>? _firstRow(Map<String, dynamic> response) {
+    try {
+      final table =
+          (response['CommonResult'] as Map<String, dynamic>?)?['Table']
+              as List<dynamic>?;
+      if (table == null || table.isEmpty) return null;
+      return table.first as Map<String, dynamic>;
+    } catch (_) {
+      return null;
     }
   }
 }

@@ -29,7 +29,7 @@ class AppDrawer extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            _buildHeader(user?.name, user?.email),
+           // _buildHeader(user?.name, user?.email),
             const SizedBox(height: 8),
             _buildTile(
               context,

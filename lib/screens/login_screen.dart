@@ -14,13 +14,11 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -31,10 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!_formKey.currentState!.validate()) return;
 
-    final success = await authProvider.login(
-      _emailController.text,
-      _passwordController.text,
-    );
+    final success = await authProvider.login(_passwordController.text);
 
     if (success && mounted) {
       Navigator.pushReplacementNamed(context, AppRoutes.home);
@@ -70,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Sign in to continue',
+                    'Enter your password to continue',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: AppColors.greyText,
@@ -78,28 +73,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-
-                  // Email field
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      hintText: 'you@example.com',
-                      prefixIcon: Icon(Icons.email_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Email is required';
-                      }
-                      if (!value.contains('@')) {
-                        return 'Enter a valid email';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
 
                   // Password field
                   TextFormField(
@@ -133,17 +106,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
 
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: const Text('Forgot password?'),
-                    ),
-                  ),
-
+                  // Error message
                   if (authProvider.errorMessage != null) ...[
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Text(
                       authProvider.errorMessage!,
                       style: const TextStyle(
@@ -156,23 +121,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Login button with gradient
                   _buildLoginButton(authProvider),
 
                   const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "Don't have an account?",
-                        style: TextStyle(color: AppColors.greyText),
-                      ),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text('Sign up'),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),

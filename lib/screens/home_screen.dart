@@ -7,11 +7,6 @@ import 'tabs/menu_tab.dart';
 import 'tabs/orders_tab.dart';
 import 'tabs/profile_tab.dart';
 
-/// Main Home shell.
-///
-/// Combines a side [AppDrawer] with a [BottomNavigationBar]. Both controls
-/// stay in sync via [_selectedIndex] - tapping a drawer item updates the
-/// bottom bar and vice versa.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -22,7 +17,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  static const List<String> _titles = ['BALLY\'S', 'Menu', 'My Orders', 'Profile'];
+  static const List<String> _titles = [
+    "BALLY'S",
+    'Menu',
+    'My Orders',
+    'Profile',
+  ];
 
   void _onSelectTab(int index) {
     setState(() => _selectedIndex = index);
@@ -31,16 +31,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final pages = [
-      HomeTab(onViewMenu: () => _onSelectTab(1)),
+      const HomeTab(),          // no longer needs onViewMenu
       const MenuTab(),
       const OrdersTab(),
       const ProfileTab(),
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_titles[_selectedIndex]),
-      ),
+      appBar: AppBar(title: Text(_titles[_selectedIndex])),
       drawer: AppDrawer(
         selectedIndex: _selectedIndex,
         onSelectTab: _onSelectTab,
@@ -77,7 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedItemColor: AppColors.primaryOrange,
           unselectedItemColor: AppColors.greyText,
           showUnselectedLabels: true,
-          selectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          selectedLabelStyle:
+              const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
           unselectedLabelStyle: const TextStyle(fontSize: 12),
           elevation: 0,
           items: const [

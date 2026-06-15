@@ -40,7 +40,8 @@ class ProfileTab extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            user?.email ?? '',
+            // user?.email ?? '',
+            "dkk",
             style: const TextStyle(color: AppColors.greyText, fontSize: 13),
           ),
           const SizedBox(height: 24),
