@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // ── Background image ──────────────────────────────────────
           Positioned.fill(
             child: Image.asset(
-              'assets/images/login_bacground.png',
+              'assets/images/login_background.png',
               fit: BoxFit.cover,
             ),
           ),

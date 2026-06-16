@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/department.dart';
@@ -226,8 +227,11 @@ class _GlobalSearchResults extends StatelessWidget {
           const _SectionHeader(title: 'Departments'),
           ...deptResults.map((d) => ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading:
-                    const Icon(Icons.store_outlined, color: AppColors.primaryOrange),
+                leading: SizedBox(
+                  width: 32,
+                  height: 32,
+                  child: _DeptLottieIcon(dept: d),
+                ),
                 title: Text(d.deptName,
                     style: const TextStyle(color: Colors.white)),
                 subtitle: Text('Code: ${d.deptCode}',
@@ -293,13 +297,32 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// ── Department card (unchanged) ──────────────────────────────────────────
+// ── Department Lottie resolver ───────────────────────────────────────────
 
-class _DepartmentCard extends StatelessWidget {
+/// Resolves which Lottie asset to use based on department name, with a
+/// fallback to a generic store icon if no asset matches.
+String? _deptLottieAsset(Department dept) {
+  final name = dept.deptName.toLowerCase();
+  if (name.contains('beverage') || name.contains('drink') || name.contains('coffee')) {
+    return 'assets/lottie/CoffeeCup.json';
+  }
+  if (name.contains('food')) {
+    return 'assets/lottie/Food.json';
+  }
+  if (name.contains('desert') || name.contains('dessert') || name.contains('ice cream') || name.contains('icecream')) {
+    return 'assets/lottie/IceCream.json';
+  }
+  if (name.contains('cigarette') || name.contains('tobacco')) {
+    return 'assets/lottie/cigarette.json';
+  }
+  return null;
+}
+
+class _DeptLottieIcon extends StatelessWidget {
   final Department dept;
-  const _DepartmentCard({required this.dept});
+  const _DeptLottieIcon({required this.dept});
 
-  IconData _icon() {
+  IconData _fallbackIcon() {
     final name = dept.deptName.toLowerCase();
     if (name.contains('beverage') || name.contains('drink')) {
       return Icons.local_bar_outlined;
@@ -313,6 +336,27 @@ class _DepartmentCard extends StatelessWidget {
     }
     return Icons.store_outlined;
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final asset = _deptLottieAsset(dept);
+    if (asset == null) {
+      return Icon(_fallbackIcon(), color: AppColors.primaryOrange);
+    }
+    return Lottie.asset(
+      asset,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) =>
+          Icon(_fallbackIcon(), color: AppColors.primaryOrange),
+    );
+  }
+}
+
+// ── Department card ──────────────────────────────────────────────────────
+
+class _DepartmentCard extends StatelessWidget {
+  final Department dept;
+  const _DepartmentCard({required this.dept});
 
   @override
   Widget build(BuildContext context) {
@@ -330,13 +374,14 @@ class _DepartmentCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 56,
-                height: 56,
+                width: 64,
+                height: 64,
                 decoration: BoxDecoration(
                   gradient: AppColors.primaryGradient,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(_icon(), color: Colors.white, size: 28),
+                padding: const EdgeInsets.all(10),
+                child: _DeptLottieIcon(dept: dept),
               ),
               const SizedBox(height: 12),
               Text(
