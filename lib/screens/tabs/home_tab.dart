@@ -363,6 +363,11 @@ class _DepartmentCard extends StatelessWidget {
     return Material(
       color: AppColors.surfaceBlack,
       borderRadius: BorderRadius.circular(16),
+      child: DecoratedBox(
+    decoration: BoxDecoration(
+      border: Border.all(color: AppColors.primaryOrange, width: 1.5),
+      borderRadius: BorderRadius.circular(16),
+    ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () {
@@ -373,16 +378,25 @@ class _DepartmentCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                padding: const EdgeInsets.all(10),
-                child: _DeptLottieIcon(dept: dept),
-              ),
+    //           Container(
+    //             width: 80,
+    //             height: 80,
+    //             decoration: BoxDecoration(
+    //               gradient: AppColors.primaryGradient,
+    //               borderRadius: BorderRadius.circular(14),
+    //                border: Border.all(              // ✅ orange border
+    //   color: AppColors.primaryOrange,
+    //   width: 2.0,
+    // ),
+    //             ),
+    //             padding: const EdgeInsets.all(10),
+    //             child: _DeptLottieIcon(dept: dept),
+    //           ),
+    SizedBox(
+  width: 80,
+  height: 80,
+  child: _DeptLottieIcon(dept: dept),
+),
               const SizedBox(height: 12),
               Text(
                 dept.deptName,
@@ -406,6 +420,7 @@ class _DepartmentCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

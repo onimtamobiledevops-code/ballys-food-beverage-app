@@ -18,7 +18,16 @@ class CategoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(department.deptName)),
-      body: _buildBody(context, menuData, categories),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/categoryscreenbackground.png',
+            fit: BoxFit.cover,
+          ),
+          _buildBody(context, menuData, categories),
+        ],
+      ),
     );
   }
 
@@ -96,7 +105,7 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.surfaceBlack,
+      color: AppColors.surfaceBlack.withOpacity(0.9),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),

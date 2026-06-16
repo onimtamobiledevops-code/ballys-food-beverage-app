@@ -71,6 +71,8 @@ flutter:
     - assets/lottie/CoffeeCup.json
     - assets/lottie/IceCream.json
     - assets/lottie/cigarette.json
+    - assets/images/categoryscreenbackground.png
+    - assets/images/itemscreenbackground.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -18,7 +18,16 @@ class ItemScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(category.catName)),
-      body: _buildBody(context, menuData, items),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/itemscreenbackground.png',
+            fit: BoxFit.cover,
+          ),
+          _buildBody(context, menuData, items),
+        ],
+      ),
     );
   }
 
@@ -95,7 +104,7 @@ class _ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.surfaceBlack,
+      color: AppColors.surfaceBlack.withOpacity(0.9),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
