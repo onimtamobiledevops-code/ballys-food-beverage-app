@@ -24,7 +24,7 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final deviceId = await DeviceService.getDeviceId();
-
+print('Device ID: $deviceId');
       // Step 1 — login
       final loginRes = await _apiService.post('CommonExecute', {
         "HasReturnData": "T",
