@@ -26,38 +26,38 @@ class _MenuTabState extends State<MenuTab> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 8),
-        _buildCategoryTabs(),
-        const SizedBox(height: 8),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: GridView.builder(
-              padding: const EdgeInsets.only(bottom: 16),
-              itemCount: _filteredItems.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 14,
-                crossAxisSpacing: 14,
-                childAspectRatio: 0.85,
-              ),
-              itemBuilder: (context, index) {
-                final item = _filteredItems[index];
-                return MenuCard(
-                  item: item,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('${item.name} added to cart'),
-                        backgroundColor: AppColors.surfaceBlackLight,
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ),
+        // const SizedBox(height: 8),
+        // _buildCategoryTabs(),
+        // const SizedBox(height: 8),
+        // Expanded(
+        //   child: Padding(
+        //     padding: const EdgeInsets.symmetric(horizontal: 16),
+        //     child: GridView.builder(
+        //       padding: const EdgeInsets.only(bottom: 16),
+        //       itemCount: _filteredItems.length,
+        //       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        //         crossAxisCount: 2,
+        //         mainAxisSpacing: 14,
+        //         crossAxisSpacing: 14,
+        //         childAspectRatio: 0.85,
+        //       ),
+        //       itemBuilder: (context, index) {
+        //         final item = _filteredItems[index];
+        //         return MenuCard(
+        //           item: item,
+        //           onTap: () {
+        //             ScaffoldMessenger.of(context).showSnackBar(
+        //               SnackBar(
+        //                 content: Text('${item.name} added to cart'),
+        //                 backgroundColor: AppColors.surfaceBlackLight,
+        //               ),
+        //             );
+        //           },
+        //         );
+        //       },
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

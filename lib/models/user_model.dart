@@ -1,9 +1,9 @@
-/// Represents a successfully authenticated user.
+
 class UserModel {
-  final String name;      // Emp_Name from login response
-  final int secLevel;     // Sec_Lvl from login response
-  final int deviceId;     // Device_Id from device-check response
-  final String docNo;     // Doc_No from device-check response
+  final String name;      
+  final int secLevel;     
+  final int deviceId;   
+  final String docNo;    
 
   const UserModel({
     required this.name,

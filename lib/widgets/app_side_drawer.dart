@@ -16,16 +16,15 @@ class AppSideDrawer extends StatelessWidget {
   });
 
   static const List<_DrawerItem> _items = [
-    _DrawerItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home', index: 0),
-    _DrawerItem(icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu, label: 'Current Orders', index: 1),
-    _DrawerItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Past Orders', index: 2),
-     _DrawerItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Kot Web Orders', index: 0),
-    _DrawerItem(icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu, label: 'Steward', index: 1),
-    _DrawerItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Guest', index: 2),
-_DrawerItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Pits', index: 2),
-  _DrawerItem(icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu, label: 'Issue Note', index: 1),
-    _DrawerItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Clear Notofication', index: 2),
-
+    _DrawerItem(icon: Icons.home_outlined,           activeIcon: Icons.home,              label: 'Home',               index: 0),
+    _DrawerItem(icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu,   label: 'Current Orders',     index: 1),
+    _DrawerItem(icon: Icons.receipt_long_outlined,   activeIcon: Icons.receipt_long,      label: 'Past Orders',        index:2),
+    _DrawerItem(icon: Icons.language_outlined,       activeIcon: Icons.language,          label: 'KOT Web Orders',     index: 3),
+    _DrawerItem(icon: Icons.room_service_outlined,   activeIcon: Icons.room_service,      label: 'Steward',            index: 2),
+    _DrawerItem(icon: Icons.people_outline,          activeIcon: Icons.people,            label: 'Guest',              index: 2),
+    _DrawerItem(icon: Icons.table_bar_outlined,      activeIcon: Icons.table_bar,         label: 'Pits',               index: 2),
+    _DrawerItem(icon: Icons.note_alt_outlined,       activeIcon: Icons.note_alt,          label: 'Issue Note',         index: 3),
+    _DrawerItem(icon: Icons.notifications_off_outlined, activeIcon: Icons.notifications_off, label: 'Clear Notification', index: 3),
   ];
 
   @override
@@ -109,7 +108,7 @@ _DrawerItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, l
                       borderRadius: BorderRadius.circular(10),
                     ),
                     onTap: () {
-                      Navigator.pop(context); // close drawer
+                      Navigator.pop(context);
                       onSelectTab(item.index);
                     },
                   );
