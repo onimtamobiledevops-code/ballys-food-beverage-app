@@ -76,7 +76,7 @@ print('Device ID: $deviceId');
             "Para_Type": "int",
           },
           {
-            "Para_Data": deviceId,
+            "Para_Data": "e3010a59df78cdae",
             "Para_Direction": "Input",
             "Para_Lenth": 100,
             "Para_Name": "@Text1",

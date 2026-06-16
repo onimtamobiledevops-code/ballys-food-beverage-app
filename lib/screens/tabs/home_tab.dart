@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/department.dart';
+import '../../models/category.dart';
+import '../../models/item.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/menu_data_provider.dart'; // ← changed
+import '../../providers/menu_data_provider.dart';
 import '../../theme/app_theme.dart';
+import '../category_screen.dart';
+import '../item_screen.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -21,10 +25,9 @@ class _HomeTabState extends State<HomeTab> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Only load if not already loaded
       final menuData = context.read<MenuDataProvider>();
       if (menuData.status == MenuDataStatus.idle) {
-        menuData.loadAll(); // ← changed
+        menuData.loadAll();
       }
     });
   }
@@ -35,16 +38,10 @@ class _HomeTabState extends State<HomeTab> {
     super.dispose();
   }
 
-  List<Department> _filtered(List<Department> all) {
-    if (_searchQuery.isEmpty) return all;
-    final q = _searchQuery.toLowerCase();
-    return all.where((d) => d.deptName.toLowerCase().contains(q)).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser;
-    final menuData = context.watch<MenuDataProvider>(); // ← changed
+    final menuData = context.watch<MenuDataProvider>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +70,7 @@ class _HomeTabState extends State<HomeTab> {
                 style: const TextStyle(color: Colors.white),
                 onChanged: (v) => setState(() => _searchQuery = v),
                 decoration: InputDecoration(
-                  hintText: 'Search departments...',
+                  hintText: 'Search departments, categories, items...',
                   hintStyle: const TextStyle(color: AppColors.greyText),
                   prefixIcon:
                       const Icon(Icons.search, color: AppColors.greyText),
@@ -97,31 +94,36 @@ class _HomeTabState extends State<HomeTab> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Departments',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
+              if (_searchQuery.isEmpty)
+                const Text(
+                  'Departments',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
               const SizedBox(height: 12),
             ],
           ),
         ),
-        Expanded(child: _buildBody(menuData)), // ← changed
+        Expanded(
+          child: _searchQuery.isNotEmpty
+              ? _GlobalSearchResults(query: _searchQuery, menuData: menuData)
+              : _buildBody(menuData),
+        ),
       ],
     );
   }
 
-  Widget _buildBody(MenuDataProvider provider) { // ← changed
+  Widget _buildBody(MenuDataProvider provider) {
     switch (provider.status) {
-      case MenuDataStatus.loading: // ← changed
+      case MenuDataStatus.loading:
         return const Center(
           child: CircularProgressIndicator(color: AppColors.primaryOrange),
         );
 
-      case MenuDataStatus.error: // ← changed
+      case MenuDataStatus.error:
         return Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
@@ -138,7 +140,7 @@ class _HomeTabState extends State<HomeTab> {
                 ),
                 const SizedBox(height: 20),
                 OutlinedButton.icon(
-                  onPressed: provider.loadAll, // ← changed
+                  onPressed: provider.loadAll,
                   icon: const Icon(Icons.refresh),
                   label: const Text('Retry'),
                   style: OutlinedButton.styleFrom(
@@ -151,13 +153,13 @@ class _HomeTabState extends State<HomeTab> {
           ),
         );
 
-      case MenuDataStatus.loaded: // ← changed
-        final items = _filtered(provider.departments);
+      case MenuDataStatus.loaded:
+        final items = provider.departments;
         if (items.isEmpty) {
-          return Center(
+          return const Center(
             child: Text(
-              'No departments match "$_searchQuery".',
-              style: const TextStyle(color: AppColors.greyText),
+              'No departments available.',
+              style: TextStyle(color: AppColors.greyText),
             ),
           );
         }
@@ -180,7 +182,118 @@ class _HomeTabState extends State<HomeTab> {
   }
 }
 
-// ── Department card (unchanged) ──────────────────────────────────────────────
+// ── Global search results ────────────────────────────────────────────────
+
+class _GlobalSearchResults extends StatelessWidget {
+  final String query;
+  final MenuDataProvider menuData;
+
+  const _GlobalSearchResults({required this.query, required this.menuData});
+
+  @override
+  Widget build(BuildContext context) {
+    if (menuData.status != MenuDataStatus.loaded) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.primaryOrange),
+      );
+    }
+
+    final q = query.toLowerCase();
+
+    final deptResults = menuData.departments
+        .where((d) => d.deptName.toLowerCase().contains(q))
+        .toList();
+    final catResults = menuData.allCategories
+        .where((c) => c.catName.toLowerCase().contains(q))
+        .toList();
+    final itemResults = menuData.allItems
+        .where((i) => i.prodName.toLowerCase().contains(q))
+        .toList();
+
+    if (deptResults.isEmpty && catResults.isEmpty && itemResults.isEmpty) {
+      return Center(
+        child: Text(
+          'No results for "$query".',
+          style: const TextStyle(color: AppColors.greyText),
+        ),
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+      children: [
+        if (deptResults.isNotEmpty) ...[
+          const _SectionHeader(title: 'Departments'),
+          ...deptResults.map((d) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading:
+                    const Icon(Icons.store_outlined, color: AppColors.primaryOrange),
+                title: Text(d.deptName,
+                    style: const TextStyle(color: Colors.white)),
+                subtitle: Text('Code: ${d.deptCode}',
+                    style: const TextStyle(color: AppColors.greyText)),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => CategoryScreen(department: d)),
+                ),
+              )),
+        ],
+        if (catResults.isNotEmpty) ...[
+          const _SectionHeader(title: 'Categories'),
+          ...catResults.map((c) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.category_outlined,
+                    color: AppColors.primaryOrange),
+                title: Text(c.catName,
+                    style: const TextStyle(color: Colors.white)),
+                subtitle: Text('Code: ${c.catCode}',
+                    style: const TextStyle(color: AppColors.greyText)),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => ItemScreen(category: c)),
+                ),
+              )),
+        ],
+        if (itemResults.isNotEmpty) ...[
+          const _SectionHeader(title: 'Items'),
+          ...itemResults.map((i) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.fastfood_outlined,
+                    color: AppColors.primaryOrange),
+                title: Text(i.prodName,
+                    style: const TextStyle(color: Colors.white)),
+                subtitle: Text('Rs. ${i.sellingPrice.toStringAsFixed(2)}',
+                    style: const TextStyle(color: AppColors.primaryOrange)),
+              )),
+        ],
+      ],
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  const _SectionHeader({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 4),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: AppColors.primaryOrange,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+      ),
+    );
+  }
+}
+
+// ── Department card (unchanged) ──────────────────────────────────────────
 
 class _DepartmentCard extends StatelessWidget {
   final Department dept;

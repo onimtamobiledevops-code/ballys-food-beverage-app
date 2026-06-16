@@ -43,7 +43,11 @@ class MenuDataProvider extends ChangeNotifier {
       _categoriesByDept[deptCode] ?? [];
 
   List<Item> itemsOf(String catCode) => _itemsByCat[catCode] ?? [];
+List<Category> get allCategories =>
+      _categoriesByDept.values.expand((c) => c).toList();
 
+  List<Item> get allItems =>
+      _itemsByCat.values.expand((i) => i).toList();
   /// Call this once after a successful login.
   /// Fetches departments → then categories for each dept →
   /// then items for each category, all sequentially.
