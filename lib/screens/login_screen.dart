@@ -139,9 +139,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Password is required';
                           }
-                          // if (value.length < 4) {
-                          //   return 'Minimum 4 characters';
-                          // }
+                          if (value.length < 4) {
+                            return 'Minimum 4 characters';
+                          }
                           return null;
                         },
                       ),
@@ -173,10 +173,9 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLogo() {
     return Center(
       child: Container(
-        width: 84,
-        height: 84,
+        width: 200,
+        height: 200,
         decoration: BoxDecoration(
-          gradient: AppColors.primaryGradient,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -186,7 +185,13 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ],
         ),
-        child: const Icon(Icons.restaurant, color: Colors.white, size: 42),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.asset(
+            'assets/images/login_logo.png',
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
     );
   }
