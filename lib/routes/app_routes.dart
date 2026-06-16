@@ -1,41 +1,40 @@
 import 'package:flutter/material.dart';
-
 import '../models/category.dart';
 import '../models/department.dart';
 import '../screens/category_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/item_screen.dart';
 import '../screens/login_screen.dart';
+import '../screens/splash_screen.dart';
 
 class AppRoutes {
   AppRoutes._();
 
+  static const String splash = '/splash';
   static const String login = '/login';
   static const String home = '/home';
   static const String categories = '/categories';
   static const String items = '/items';
 
-  static const String initialRoute = login;
+  static const String initialRoute = splash;
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case splash:
+        return _buildRoute(const SplashScreen(), settings);
       case login:
         return _buildRoute(const LoginScreen(), settings);
-
       case home:
         return _buildRoute(const HomeScreen(), settings);
-
       case categories:
         final department = settings.arguments as Department;
         return _buildRoute(
           CategoryScreen(department: department),
           settings,
         );
-
       case items:
         final category = settings.arguments as Category;
         return _buildRoute(ItemScreen(category: category), settings);
-
       default:
         return _buildRoute(
           Scaffold(

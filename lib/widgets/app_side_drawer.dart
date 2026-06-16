@@ -17,9 +17,15 @@ class AppSideDrawer extends StatelessWidget {
 
   static const List<_DrawerItem> _items = [
     _DrawerItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home', index: 0),
-    _DrawerItem(icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu, label: 'Menu', index: 1),
-    _DrawerItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Orders', index: 2),
-    _DrawerItem(icon: Icons.person_outline, activeIcon: Icons.person, label: 'Profile', index: 3),
+    _DrawerItem(icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu, label: 'Current Orders', index: 1),
+    _DrawerItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Past Orders', index: 2),
+     _DrawerItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Kot Web Orders', index: 0),
+    _DrawerItem(icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu, label: 'Steward', index: 1),
+    _DrawerItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Guest', index: 2),
+_DrawerItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Pits', index: 2),
+  _DrawerItem(icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu, label: 'Issue Note', index: 1),
+    _DrawerItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Clear Notofication', index: 2),
+
   ];
 
   @override

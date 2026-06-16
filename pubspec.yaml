@@ -40,6 +40,7 @@ dependencies:
   flutter_udid: ^2.0.1
   uuid: ^4.4.0
   lottie: ^3.1.2
+  video_player: ^2.9.2
   
 dev_dependencies:
   flutter_test:
@@ -73,6 +74,7 @@ flutter:
     - assets/lottie/cigarette.json
     - assets/images/categoryscreenbackground.png
     - assets/images/itemscreenbackground.png
+    - assets/video/splashscreen.mp4
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

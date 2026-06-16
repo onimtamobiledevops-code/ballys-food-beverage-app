@@ -39,19 +39,19 @@ class ProfileTab extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 2),
-          Text(
-            // user?.email ?? '',
-            "dkk",
-            style: const TextStyle(color: AppColors.greyText, fontSize: 13),
-          ),
+          // Text(
+          //   // user?.email ?? '',
+          //   "dkk",
+          //   style: const TextStyle(color: AppColors.greyText, fontSize: 13),
+          // ),
           const SizedBox(height: 24),
 
-          _buildOption(context, icon: Icons.person_outline, label: 'Edit Profile'),
-          _buildOption(context, icon: Icons.location_on_outlined, label: 'Delivery Addresses'),
-          _buildOption(context, icon: Icons.payment_outlined, label: 'Payment Methods'),
-          _buildOption(context, icon: Icons.notifications_outlined, label: 'Notifications'),
-          _buildOption(context, icon: Icons.privacy_tip_outlined, label: 'Privacy & Security'),
-          _buildOption(context, icon: Icons.help_outline, label: 'Help & Support'),
+          // _buildOption(context, icon: Icons.person_outline, label: 'Edit Profile'),
+          // _buildOption(context, icon: Icons.location_on_outlined, label: 'Delivery Addresses'),
+          // _buildOption(context, icon: Icons.payment_outlined, label: 'Payment Methods'),
+          _buildOption(context, icon: Icons.notifications_outlined, label: 'Clear Notifications'),
+          // _buildOption(context, icon: Icons.privacy_tip_outlined, label: 'Privacy & Security'),
+          // _buildOption(context, icon: Icons.help_outline, label: 'Help & Support'),
 
           const SizedBox(height: 16),
           SizedBox(
