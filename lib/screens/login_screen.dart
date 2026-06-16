@@ -44,82 +44,128 @@ class _LoginScreenState extends State<LoginScreen> {
     final authProvider = context.watch<AuthProvider>();
 
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 40),
-                  _buildLogo(),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "Bally's Food & Beverage",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Enter your password to continue',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: AppColors.greyText, fontSize: 14),
-                  ),
-                  const SizedBox(height: 40),
+      body: Stack(
+        children: [
+          // ── Background image ──────────────────────────────────────
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/login_bacground.png',
+              fit: BoxFit.cover,
+            ),
+          ),
 
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      hintText: 'Enter your password',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                          color: AppColors.greyText,
-                        ),
-                        onPressed: () =>
-                            setState(() => _obscurePassword = !_obscurePassword),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Password is required';
-                      }
-                      if (value.length < 4) return 'Minimum 4 characters';
-                      return null;
-                    },
-                  ),
+          // ── Dark scrim ────────────────────────────────────────────
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.55),
+            ),
+          ),
 
-                  if (authProvider.errorMessage != null) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      authProvider.errorMessage!,
-                      style: const TextStyle(
-                          color: AppColors.primaryRed, fontSize: 13),
-                      textAlign: TextAlign.center,
-                    ),
+          // ── Solid black band behind logo/title/subtitle ───────────
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 420,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black,
+                    Colors.black,
+                    Colors.black.withOpacity(0.0),
                   ],
-
-                  const SizedBox(height: 24),
-                  _buildLoginButton(authProvider),
-                  const SizedBox(height: 24),
-                ],
+                  stops: const [0.0, 0.75, 1.0],
+                ),
               ),
             ),
           ),
-        ),
+
+          // ── Original UI with top section raised ───────────────────
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 16), // raised from 40 → 16
+                      _buildLogo(),
+                      const SizedBox(height: 12),
+                      const Text(
+                        "Bally's Food & Beverage",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Enter your password to continue',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: AppColors.greyText, fontSize: 14),
+                      ),
+                      const SizedBox(height: 40),
+
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Enter your password',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                              color: AppColors.greyText,
+                            ),
+                            onPressed: () => setState(
+                                () => _obscurePassword = !_obscurePassword),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Password is required';
+                          }
+                          // if (value.length < 4) {
+                          //   return 'Minimum 4 characters';
+                          // }
+                          return null;
+                        },
+                      ),
+
+                      if (authProvider.errorMessage != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          authProvider.errorMessage!,
+                          style: const TextStyle(
+                              color: AppColors.primaryRed, fontSize: 13),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+
+                      const SizedBox(height: 24),
+                      _buildLoginButton(authProvider),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
