@@ -5,6 +5,9 @@ PODS:
   - flutter_udid (0.0.1):
     - Flutter
     - SAMKeychain
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - SAMKeychain (1.5.3)
   - video_player_avfoundation (0.0.1):
     - Flutter
@@ -14,6 +17,7 @@ DEPENDENCIES:
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_udid (from `.symlinks/plugins/flutter_udid/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/darwin`)
 
 SPEC REPOS:
@@ -27,6 +31,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_udid:
     :path: ".symlinks/plugins/flutter_udid/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   video_player_avfoundation:
     :path: ".symlinks/plugins/video_player_avfoundation/darwin"
 
@@ -34,6 +40,7 @@ SPEC CHECKSUMS:
   device_info_plus: 71ffc6ab7634ade6267c7a93088ed7e4f74e5896
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_udid: ae1de3aafc160cef344ecdd7ad9defa0b6a2b2b3
+  path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   SAMKeychain: 483e1c9f32984d50ca961e26818a534283b4cd5c
   video_player_avfoundation: 3453f792138786248960ca029747fcd9f318ef52
 

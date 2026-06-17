@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../providers/menu_data_provider.dart';
 import '../routes/app_routes.dart';
 import '../theme/app_theme.dart';
+import '../widgets/animated_brand_header.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -94,25 +95,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 16), // raised from 40 → 16
+                      const SizedBox(height: 16),
                       _buildLogo(),
-                      const SizedBox(height: 12),
-                      const Text(
-                        "Bally's Food & Beverage",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      const Text(
-                        'Enter your password to continue',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: AppColors.greyText, fontSize: 14),
+                      const SizedBox(height: 20),
+                      const AnimatedBrandHeader(
+                        title: 'ServeDish',
+                        slogan: 'Serve Smart. Serve Fast',
                       ),
                       const SizedBox(height: 40),
 

@@ -6,18 +6,38 @@ import '../models/department.dart';
 import '../providers/menu_data_provider.dart';
 import '../theme/app_theme.dart';
 
-class CategoryScreen extends StatelessWidget {
+class CategoryScreen extends StatefulWidget {
   final Department department;
 
   const CategoryScreen({super.key, required this.department});
 
   @override
+  State<CategoryScreen> createState() => _CategoryScreenState();
+}
+
+class _CategoryScreenState extends State<CategoryScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final menuData = context.watch<MenuDataProvider>();
-    final categories = menuData.categoriesOf(department.deptCode);
+    final categories = menuData.categoriesOf(widget.department.deptCode);
+    final filteredCategories = _searchQuery.isEmpty
+        ? categories
+        : categories
+            .where((c) =>
+                c.catName.toLowerCase().contains(_searchQuery.toLowerCase()))
+            .toList();
 
     return Scaffold(
-      appBar: AppBar(title: Text(department.deptName)),
+      appBar: AppBar(title: Text(widget.department.deptName)),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -25,7 +45,44 @@ class CategoryScreen extends StatelessWidget {
             'assets/images/categoryscreenbackground.png',
             fit: BoxFit.cover,
           ),
-          _buildBody(context, menuData, categories),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                child: TextField(
+                  controller: _searchController,
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: (v) => setState(() => _searchQuery = v),
+                  decoration: InputDecoration(
+                    hintText: 'Search categories...',
+                    hintStyle: const TextStyle(color: AppColors.greyText),
+                    prefixIcon:
+                        const Icon(Icons.search, color: AppColors.greyText),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.close,
+                                color: AppColors.greyText),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: AppColors.surfaceBlack,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: _buildBody(context, menuData, filteredCategories),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -74,16 +131,19 @@ class CategoryScreen extends StatelessWidget {
     }
 
     if (categories.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'No categories found.',
-          style: TextStyle(color: AppColors.greyText),
+          _searchQuery.isEmpty
+              ? 'No categories found.'
+              : 'No categories match "$_searchQuery".',
+          style: const TextStyle(color: AppColors.greyText),
+          textAlign: TextAlign.center,
         ),
       );
     }
 
     return GridView.builder(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       itemCount: categories.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,

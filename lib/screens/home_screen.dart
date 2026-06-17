@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   static const List<String> _titles = [
-    "BALLY'S",
+    "BALLYS",
     'Menu',
     'My Orders',
     'Profile',

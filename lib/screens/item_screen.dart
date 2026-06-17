@@ -9,21 +9,39 @@ import '../theme/app_theme.dart';
 import '../widgets/quantity_stepper.dart';
 import 'checkout_screen.dart';
 
-/// Place this file at: lib/screens/item_screen.dart (replaces the existing
-/// file).
-class ItemScreen extends StatelessWidget {
+class ItemScreen extends StatefulWidget {
   final Category category;
 
   const ItemScreen({super.key, required this.category});
 
   @override
+  State<ItemScreen> createState() => _ItemScreenState();
+}
+
+class _ItemScreenState extends State<ItemScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final menuData = context.watch<MenuDataProvider>();
-    final items = menuData.itemsOf(category.catCode);
+    final items = menuData.itemsOf(widget.category.catCode);
+    final filteredItems = _searchQuery.isEmpty
+        ? items
+        : items
+            .where((i) =>
+                i.prodName.toLowerCase().contains(_searchQuery.toLowerCase()))
+            .toList();
     final cart = context.watch<CartProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: Text(category.catName)),
+      appBar: AppBar(title: Text(widget.category.catName)),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -31,7 +49,44 @@ class ItemScreen extends StatelessWidget {
             'assets/images/itemscreenbackground.png',
             fit: BoxFit.cover,
           ),
-          _buildBody(context, menuData, items),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                child: TextField(
+                  controller: _searchController,
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: (v) => setState(() => _searchQuery = v),
+                  decoration: InputDecoration(
+                    hintText: 'Search items...',
+                    hintStyle: const TextStyle(color: AppColors.greyText),
+                    prefixIcon:
+                        const Icon(Icons.search, color: AppColors.greyText),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.close,
+                                color: AppColors.greyText),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: AppColors.surfaceBlack,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: _buildBody(context, menuData, filteredItems),
+              ),
+            ],
+          ),
         ],
       ),
       bottomNavigationBar: cart.isEmpty ? null : _CartBar(cart: cart),
@@ -81,16 +136,19 @@ class ItemScreen extends StatelessWidget {
     }
 
     if (items.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'No items found.',
-          style: TextStyle(color: AppColors.greyText),
+          _searchQuery.isEmpty
+              ? 'No items found.'
+              : 'No items match "$_searchQuery".',
+          style: const TextStyle(color: AppColors.greyText),
+          textAlign: TextAlign.center,
         ),
       );
     }
 
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
       itemCount: items.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
