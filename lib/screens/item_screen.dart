@@ -3,9 +3,14 @@ import 'package:provider/provider.dart';
 
 import '../models/category.dart';
 import '../models/item.dart';
+import '../providers/cart_provider.dart';
 import '../providers/menu_data_provider.dart';
 import '../theme/app_theme.dart';
+import '../widgets/quantity_stepper.dart';
+import 'checkout_screen.dart';
 
+/// Place this file at: lib/screens/item_screen.dart (replaces the existing
+/// file).
 class ItemScreen extends StatelessWidget {
   final Category category;
 
@@ -15,6 +20,7 @@ class ItemScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final menuData = context.watch<MenuDataProvider>();
     final items = menuData.itemsOf(category.catCode);
+    final cart = context.watch<CartProvider>();
 
     return Scaffold(
       appBar: AppBar(title: Text(category.catName)),
@@ -28,6 +34,7 @@ class ItemScreen extends StatelessWidget {
           _buildBody(context, menuData, items),
         ],
       ),
+      bottomNavigationBar: cart.isEmpty ? null : _CartBar(cart: cart),
     );
   }
 
@@ -83,13 +90,13 @@ class ItemScreen extends StatelessWidget {
     }
 
     return GridView.builder(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
       itemCount: items.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 14,
         crossAxisSpacing: 14,
-        childAspectRatio: 0.9,
+        childAspectRatio: 0.78,
       ),
       itemBuilder: (context, index) => _ItemCard(item: items[index]),
     );
@@ -103,14 +110,16 @@ class _ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final qty = context.watch<CartProvider>().quantityOf(item.prodCode);
+
     return Material(
-      color: AppColors.surfaceBlack.withOpacity(0.9),
+      color: AppColors.surfaceBlack,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          // TODO: navigate to item detail or add to order
-        },
+        onTap: qty == 0
+            ? () => context.read<CartProvider>().addItem(item)
+            : null,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -158,7 +167,146 @@ class _ItemCard extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
+              const SizedBox(height: 10),
+              qty == 0
+                  ? _AddButton(
+                      onTap: () =>
+                          context.read<CartProvider>().addItem(item),
+                    )
+                  : QuantityStepper(
+                      quantity: qty,
+                      onIncrement: () => context
+                          .read<CartProvider>()
+                          .incrementQuantity(item.prodCode),
+                      onDecrement: () => context
+                          .read<CartProvider>()
+                          .decrementQuantity(item.prodCode),
+                    ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AddButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 30,
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(15),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(15),
+          onTap: onTap,
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 18),
+            child: Center(
+              child: Text(
+                'ADD',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Bottom cart bar ─────────────────────────────────────────────────────
+
+class _CartBar extends StatelessWidget {
+  final CartProvider cart;
+  const _CartBar({required this.cart});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      minimum: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      child: Container(
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: AppColors.primaryGradient,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryOrange.withOpacity(0.4),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CheckoutScreen()),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 26,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.25),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${cart.itemCount}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'View Cart',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Rs. ${cart.totalAmount.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.arrow_forward_ios,
+                      size: 14, color: Colors.white),
+                ],
+              ),
+            ),
           ),
         ),
       ),
