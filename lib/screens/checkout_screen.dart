@@ -500,7 +500,7 @@ class _PlaceOrderButton extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _DialogButton(
-                      label: 'Purchase',
+                      label: 'Piaza',
                       icon: Icons.shopping_bag_outlined,
                       isPrimary: false,
                       onTap: () {
