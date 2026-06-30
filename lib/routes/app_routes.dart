@@ -1,3 +1,4 @@
+import 'package:ballysfoodbeverage/screens/steward_screen.dart';
 import 'package:flutter/material.dart';
 import '../models/category.dart';
 import '../models/department.dart';
@@ -15,7 +16,7 @@ class AppRoutes {
   static const String home = '/home';
   static const String categories = '/categories';
   static const String items = '/items';
-
+static const String steward = '/steward';
   static const String initialRoute = splash;
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -28,6 +29,7 @@ class AppRoutes {
         return _buildRoute(const HomeScreen(), settings);
       case categories:
         final department = settings.arguments as Department;
+
         return _buildRoute(
           CategoryScreen(department: department),
           settings,
@@ -35,6 +37,8 @@ class AppRoutes {
       case items:
         final category = settings.arguments as Category;
         return _buildRoute(ItemScreen(category: category), settings);
+      case steward:
+        return MaterialPageRoute(builder: (_) => const StewardScreen());
       default:
         return _buildRoute(
           Scaffold(

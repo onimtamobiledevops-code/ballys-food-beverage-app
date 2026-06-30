@@ -20,7 +20,7 @@ class AppSideDrawer extends StatelessWidget {
     _DrawerItem(icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu,   label: 'Current Orders',     index: 1),
     _DrawerItem(icon: Icons.receipt_long_outlined,   activeIcon: Icons.receipt_long,      label: 'Past Orders',        index:2),
     _DrawerItem(icon: Icons.language_outlined,       activeIcon: Icons.language,          label: 'KOT Web Orders',     index: 3),
-    _DrawerItem(icon: Icons.room_service_outlined,   activeIcon: Icons.room_service,      label: 'Steward',            index: 2),
+    _DrawerItem(icon: Icons.room_service_outlined,   activeIcon: Icons.room_service,      label: 'Steward',            index: 99),
     _DrawerItem(icon: Icons.people_outline,          activeIcon: Icons.people,            label: 'Guest',              index: 2),
     _DrawerItem(icon: Icons.table_bar_outlined,      activeIcon: Icons.table_bar,         label: 'Pits',               index: 2),
     _DrawerItem(icon: Icons.note_alt_outlined,       activeIcon: Icons.note_alt,          label: 'Issue Note',         index: 3),
@@ -107,10 +107,18 @@ class AppSideDrawer extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    // onTap: () {
+                    //   Navigator.pop(context);
+                    //   onSelectTab(item.index);
+                    // },
                     onTap: () {
-                      Navigator.pop(context);
-                      onSelectTab(item.index);
-                    },
+  Navigator.pop(context);
+  if (item.label == 'Steward') {
+    Navigator.pushNamed(context, AppRoutes.steward);
+  } else {
+    onSelectTab(item.index);
+  }
+},
                   );
                 }).toList(),
               ),
