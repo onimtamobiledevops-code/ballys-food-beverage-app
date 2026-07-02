@@ -28,7 +28,10 @@ class BottomNavBar extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: BottomNavigationBar(
-          currentIndex: selectedIndex,
+          // Clamp so screens that aren't a bottom-bar tab (selectedIndex == -1)
+          // or that map to a drawer-only item don't crash BottomNavigationBar.
+          currentIndex:
+              (selectedIndex >= 0 && selectedIndex <= 3) ? selectedIndex : 0,
           onTap: onTap,
           type: BottomNavigationBarType.fixed,
           backgroundColor: AppColors.surfaceBlack,

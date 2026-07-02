@@ -26,7 +26,10 @@ static const String steward = '/steward';
       case login:
         return _buildRoute(const LoginScreen(), settings);
       case home:
-        return _buildRoute(const HomeScreen(), settings);
+        final initialIndex = settings.arguments is int
+            ? settings.arguments as int
+            : 0;
+        return _buildRoute(HomeScreen(initialIndex: initialIndex), settings);
       case categories:
         final department = settings.arguments as Department;
 

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/steward_provider.dart';
 import '../theme/app_theme.dart';
+import '../widgets/app_scaffold.dart';
 
 class StewardScreen extends StatefulWidget {
   const StewardScreen({super.key});
@@ -36,11 +37,9 @@ class _StewardScreenState extends State<StewardScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<StewardProvider>();
 
-    return Scaffold(
+    return AppScaffold(
+      title: 'Steward',
       backgroundColor: AppColors.black,
-      appBar: AppBar(
-        title: const Text('Steward'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

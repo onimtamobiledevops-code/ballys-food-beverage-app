@@ -8,14 +8,19 @@ import 'tabs/orders_tab.dart';
 import 'tabs/profile_tab.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final int initialIndex;
+
+  const HomeScreen({super.key, this.initialIndex = 0});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
+  late int _selectedIndex =
+      (widget.initialIndex >= 0 && widget.initialIndex <= 3)
+          ? widget.initialIndex
+          : 0;
 
   static const List<String> _titles = [
     "BALLYS",

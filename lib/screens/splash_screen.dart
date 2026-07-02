@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+import '../providers/auth_provider.dart';
+import '../providers/menu_data_provider.dart';
 import '../routes/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -40,10 +43,21 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  void _navigate() {
+  Future<void> _navigate() async {
     if (_hasNavigated || !mounted) return;
     _hasNavigated = true;
-    Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+
+    final auth = context.read<AuthProvider>();
+    final loggedIn = await auth.tryAutoLogin();
+    if (!mounted) return;
+
+    if (loggedIn) {
+      // Restore menu data in the background, just like after a fresh login.
+      context.read<MenuDataProvider>().loadAll();
+      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+    } else {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+    }
   }
 
   @override

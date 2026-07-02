@@ -5,6 +5,7 @@ import '../models/category.dart';
 import '../models/department.dart';
 import '../providers/menu_data_provider.dart';
 import '../theme/app_theme.dart';
+import '../widgets/app_scaffold.dart';
 
 class CategoryScreen extends StatefulWidget {
   final Department department;
@@ -36,8 +37,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 c.catName.toLowerCase().contains(_searchQuery.toLowerCase()))
             .toList();
 
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.department.deptName)),
+    return AppScaffold(
+      title: widget.department.deptName,
       body: Stack(
         fit: StackFit.expand,
         children: [

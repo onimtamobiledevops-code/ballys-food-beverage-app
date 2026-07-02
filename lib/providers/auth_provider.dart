@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/user_model.dart';
 import '../services/api_service.dart';
@@ -8,6 +11,8 @@ class AuthProvider extends ChangeNotifier {
   final ApiService _apiService;
 
   AuthProvider(this._apiService);
+
+  static const String _userKey = 'auth_user';
 
   bool _isLoading = false;
   bool _isLoggedIn = false;
@@ -24,7 +29,6 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final deviceId = await DeviceService.getDeviceId();
-print('Device ID: $deviceId');
       // Step 1 — login
       final loginRes = await _apiService.post('CommonExecute', {
         "HasReturnData": "T",
@@ -101,6 +105,7 @@ print('Device ID: $deviceId');
       );
       _isLoggedIn = true;
       _isLoading = false;
+      await _persistSession(_currentUser!);
       notifyListeners();
       return true;
     } catch (e) {
@@ -108,11 +113,42 @@ print('Device ID: $deviceId');
     }
   }
 
-  void logout() {
+  /// Restores a previously saved session from local storage.
+  ///
+  /// Call this on app start (splash) before deciding which screen to show.
+  /// Returns `true` if a saved user was found and restored.
+  Future<bool> tryAutoLogin() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_userKey);
+      if (raw == null) return false;
+
+      _currentUser =
+          UserModel.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+      _isLoggedIn = true;
+      notifyListeners();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> logout() async {
     _isLoggedIn = false;
     _currentUser = null;
     _errorMessage = null;
+    await _clearSession();
     notifyListeners();
+  }
+
+  Future<void> _persistSession(UserModel user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userKey, jsonEncode(user.toJson()));
+  }
+
+  Future<void> _clearSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_userKey);
   }
 
   void clearError() {
