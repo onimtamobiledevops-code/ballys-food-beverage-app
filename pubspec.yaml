@@ -80,7 +80,8 @@ flutter:
     - assets/video/splashscreen.mp4
     - assets/lottie/Loader.json
     - assets/images/GIF1.gif
-
+    - assets/lottie/Table Chair.json
+    - assets/lottie/Table.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

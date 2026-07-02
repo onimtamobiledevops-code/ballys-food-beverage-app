@@ -18,6 +18,10 @@ class AppScaffold extends StatelessWidget {
   final List<Widget>? actions;
   final Color? backgroundColor;
 
+  /// When `false`, the side drawer is hidden and the app bar shows a back
+  /// button instead of the menu (hamburger) icon. The bottom bar still shows.
+  final bool showDrawer;
+
   const AppScaffold({
     super.key,
     required this.title,
@@ -25,6 +29,7 @@ class AppScaffold extends StatelessWidget {
     this.selectedIndex = -1,
     this.actions,
     this.backgroundColor,
+    this.showDrawer = true,
   });
 
   void _goToTab(BuildContext context, int index) {
@@ -40,11 +45,15 @@ class AppScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
+      // With no drawer, AppBar automatically shows the back button when the
+      // route can be popped.
       appBar: AppBar(title: Text(title), actions: actions),
-      drawer: AppSideDrawer(
-        selectedIndex: selectedIndex,
-        onSelectTab: (index) => _goToTab(context, index),
-      ),
+      drawer: showDrawer
+          ? AppSideDrawer(
+              selectedIndex: selectedIndex,
+              onSelectTab: (index) => _goToTab(context, index),
+            )
+          : null,
       body: SafeArea(child: body),
       bottomNavigationBar: BottomNavBar(
         selectedIndex: selectedIndex,

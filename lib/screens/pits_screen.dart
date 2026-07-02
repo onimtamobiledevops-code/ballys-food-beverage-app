@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/pit_provider.dart';
+import '../routes/app_routes.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_scaffold.dart';
 
@@ -131,15 +133,22 @@ class _PitsScreenState extends State<PitsScreen> {
           child: GridView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 180,
-              mainAxisExtent: 104,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+              maxCrossAxisExtent: 220,
+              mainAxisExtent: 150,
+              crossAxisSpacing: 14,
+              mainAxisSpacing: 14,
             ),
             itemCount: pits.length,
             itemBuilder: (context, index) {
               final pit = pits[index];
-              return _PitCard(name: pit.pitName);
+              return _PitCard(
+                name: pit.pitName,
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  AppRoutes.tables,
+                  arguments: pit.pitName,
+                ),
+              );
             },
           ),
         );
@@ -149,31 +158,40 @@ class _PitsScreenState extends State<PitsScreen> {
 
 class _PitCard extends StatelessWidget {
   final String name;
+  final VoidCallback? onTap;
 
-  const _PitCard({required this.name});
+  const _PitCard({required this.name, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceBlack,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.surfaceBlackLight),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      child: Column(
+        child: Ink(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceBlack,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.surfaceBlackLight),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.primaryOrange.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(9),
+          SizedBox(
+            width: 72,
+            height: 72,
+            child: Lottie.asset(
+              'assets/lottie/Table Chair.json',
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.table_bar,
+                color: AppColors.primaryOrange,
+                size: 40,
+              ),
             ),
-            child: const Icon(Icons.table_bar,
-                color: AppColors.primaryOrange, size: 20),
           ),
           const SizedBox(height: 8),
           Text(
@@ -186,7 +204,9 @@ class _PitCard extends StatelessWidget {
               fontSize: 14,
             ),
           ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
