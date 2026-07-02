@@ -2,7 +2,9 @@ import 'package:ballysfoodbeverage/data/repository/category_repository.dart';
 import 'package:ballysfoodbeverage/data/repository/department_repository.dart';
 import 'package:ballysfoodbeverage/data/repository/item_repository.dart';
 import 'package:ballysfoodbeverage/data/repository/steward_repository.dart';
+import 'package:ballysfoodbeverage/data/repository/pit_repository.dart';
 import 'package:ballysfoodbeverage/providers/steward_provider.dart';
+import 'package:ballysfoodbeverage/providers/pit_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -41,6 +43,11 @@ class BallysApp extends StatelessWidget {
     stewardRepository: StewardRepository(apiService),
   ),
 ),
+        ChangeNotifierProvider(
+          create: (_) => PitProvider(
+            pitRepository: PitRepository(apiService),
+          ),
+        ),
       ],
       child: MaterialApp(
         title: "Bally's Food & Beverage",

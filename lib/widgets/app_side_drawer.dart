@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../navigation/app_destinations.dart';
 import '../providers/auth_provider.dart';
 import '../routes/app_routes.dart';
 import '../theme/app_theme.dart';
@@ -15,21 +16,10 @@ class AppSideDrawer extends StatelessWidget {
     required this.onSelectTab,
   });
 
-  static const List<_DrawerItem> _items = [
-    _DrawerItem(icon: Icons.home_outlined,           activeIcon: Icons.home,              label: 'Home',               index: 0),
-    _DrawerItem(icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu,   label: 'Current Orders',     index: 1),
-    _DrawerItem(icon: Icons.receipt_long_outlined,   activeIcon: Icons.receipt_long,      label: 'Past Orders',        index:2),
-    _DrawerItem(icon: Icons.language_outlined,       activeIcon: Icons.language,          label: 'KOT Web Orders',     index: 3),
-    _DrawerItem(icon: Icons.room_service_outlined,   activeIcon: Icons.room_service,      label: 'Steward',            index: 99),
-    _DrawerItem(icon: Icons.people_outline,          activeIcon: Icons.people,            label: 'Guest',              index: 2),
-    _DrawerItem(icon: Icons.table_bar_outlined,      activeIcon: Icons.table_bar,         label: 'Pits',               index: 2),
-    _DrawerItem(icon: Icons.note_alt_outlined,       activeIcon: Icons.note_alt,          label: 'Issue Note',         index: 3),
-    _DrawerItem(icon: Icons.notifications_off_outlined, activeIcon: Icons.notifications_off, label: 'Clear Notification', index: 3),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser;
+    final currentRoute = ModalRoute.of(context)?.settings.name;
 
     return Drawer(
       backgroundColor: AppColors.surfaceBlack,
@@ -83,17 +73,20 @@ class AppSideDrawer extends StatelessWidget {
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
-                children: _items.map((item) {
-                  final isSelected = selectedIndex == item.index;
+                children: kAppDestinations.map((dest) {
+                  final isSelected = dest.isTab
+                      ? (currentRoute == AppRoutes.home &&
+                          dest.tabIndex == selectedIndex)
+                      : (dest.route == currentRoute);
                   return ListTile(
                     leading: Icon(
-                      isSelected ? item.activeIcon : item.icon,
+                      isSelected ? dest.activeIcon : dest.icon,
                       color: isSelected
                           ? AppColors.primaryOrange
                           : AppColors.greyText,
                     ),
                     title: Text(
-                      item.label,
+                      dest.label,
                       style: TextStyle(
                         color: isSelected ? Colors.white : AppColors.greyText,
                         fontWeight: isSelected
@@ -107,18 +100,7 @@ class AppSideDrawer extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    // onTap: () {
-                    //   Navigator.pop(context);
-                    //   onSelectTab(item.index);
-                    // },
-                    onTap: () {
-  Navigator.pop(context);
-  if (item.label == 'Steward') {
-    Navigator.pushNamed(context, AppRoutes.steward);
-  } else {
-    onSelectTab(item.index);
-  }
-},
+                    onTap: () => _onDestinationTap(context, dest, currentRoute),
                   );
                 }).toList(),
               ),
@@ -147,16 +129,21 @@ class AppSideDrawer extends StatelessWidget {
   }
 }
 
-class _DrawerItem {
-  final IconData icon;
-  final IconData activeIcon;
-  final String label;
-  final int index;
-
-  const _DrawerItem({
-    required this.icon,
-    required this.activeIcon,
-    required this.label,
-    required this.index,
-  });
+extension on AppSideDrawer {
+  /// Handles a tap on a drawer destination.
+  ///
+  /// - Tab destinations swap the [HomeScreen] tab via [onSelectTab].
+  /// - Route destinations push their named route (unless already there).
+  void _onDestinationTap(
+    BuildContext context,
+    AppDestination dest,
+    String? currentRoute,
+  ) {
+    Navigator.pop(context); // close the drawer first
+    if (dest.isTab) {
+      onSelectTab(dest.tabIndex!);
+    } else if (dest.route != null && dest.route != currentRoute) {
+      Navigator.pushNamed(context, dest.route!);
+    }
+  }
 }

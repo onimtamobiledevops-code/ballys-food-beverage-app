@@ -27,7 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
     'Menu',
     'My Orders',
     'Profile',
-    'stu'
   ];
 
   void _onSelectTab(int index) => setState(() => _selectedIndex = index);
