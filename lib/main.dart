@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 
 import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
-import 'providers/department_provider.dart';
 import 'providers/menu_data_provider.dart';
 
 import 'routes/app_routes.dart';
@@ -29,11 +28,6 @@ class BallysApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider(apiService)),
-        // ChangeNotifierProvider(
-        //   create: (_) => DepartmentProvider(
-        //     DepartmentRepository(apiService),
-        //   ),
-        // ),
         ChangeNotifierProvider(
           create: (_) => MenuDataProvider(
             departmentRepository: DepartmentRepository(apiService),
