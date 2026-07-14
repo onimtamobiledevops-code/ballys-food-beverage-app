@@ -1,6 +1,7 @@
 import 'package:ballysfoodbeverage/screens/steward_screen.dart';
 import 'package:ballysfoodbeverage/screens/pits_screen.dart';
 import 'package:ballysfoodbeverage/screens/tables_screen.dart';
+import 'package:ballysfoodbeverage/screens/guests_screen.dart';
 import 'package:flutter/material.dart';
 import '../models/category.dart';
 import '../models/department.dart';
@@ -21,6 +22,7 @@ class AppRoutes {
 static const String steward = '/steward';
   static const String pits = '/pits';
   static const String tables = '/tables';
+  static const String guests = '/guests';
   static const String initialRoute = splash;
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -51,6 +53,9 @@ static const String steward = '/steward';
       case tables:
         final pitName = settings.arguments as String;
         return _buildRoute(TablesScreen(pitName: pitName), settings);
+      case guests:
+        final tblCode = settings.arguments as String;
+        return _buildRoute(GuestsScreen(tblCode: tblCode), settings);
       default:
         return _buildRoute(
           Scaffold(

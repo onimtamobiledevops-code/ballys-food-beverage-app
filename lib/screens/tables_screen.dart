@@ -3,6 +3,7 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/table_provider.dart';
+import '../routes/app_routes.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_scaffold.dart';
 
@@ -94,7 +95,15 @@ class _TablesScreenState extends State<TablesScreen> {
             ),
             itemCount: tables.length,
             itemBuilder: (context, index) {
-              return _TableCard(code: tables[index].tblCode);
+              final code = tables[index].tblCode;
+              return _TableCard(
+                code: code,
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  AppRoutes.guests,
+                  arguments: code,
+                ),
+              );
             },
           ),
         );
@@ -104,22 +113,28 @@ class _TablesScreenState extends State<TablesScreen> {
 
 class _TableCard extends StatelessWidget {
   final String code;
+  final VoidCallback? onTap;
 
-  const _TableCard({required this.code});
+  const _TableCard({required this.code, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceBlack,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.surfaceBlackLight),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        child: Ink(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceBlack,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.surfaceBlackLight),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
           SizedBox(
             width: 72,
             height: 72,
@@ -144,7 +159,9 @@ class _TableCard extends StatelessWidget {
               fontSize: 14,
             ),
           ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -4,9 +4,11 @@ import 'package:ballysfoodbeverage/data/repository/item_repository.dart';
 import 'package:ballysfoodbeverage/data/repository/steward_repository.dart';
 import 'package:ballysfoodbeverage/data/repository/pit_repository.dart';
 import 'package:ballysfoodbeverage/data/repository/table_repository.dart';
+import 'package:ballysfoodbeverage/data/repository/guest_repository.dart';
 import 'package:ballysfoodbeverage/providers/steward_provider.dart';
 import 'package:ballysfoodbeverage/providers/pit_provider.dart';
 import 'package:ballysfoodbeverage/providers/table_provider.dart';
+import 'package:ballysfoodbeverage/providers/guest_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -53,6 +55,11 @@ class BallysApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => TableProvider(
             tableRepository: TableRepository(apiService),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GuestProvider(
+            guestRepository: GuestRepository(apiService),
           ),
         ),
       ],
