@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,12 +18,21 @@ class GuestsScreen extends StatefulWidget {
 }
 
 class _GuestsScreenState extends State<GuestsScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<GuestProvider>().loadGuests(widget.tblCode);
     });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -34,7 +45,37 @@ class _GuestsScreenState extends State<GuestsScreen> {
       showDrawer: false,
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: _buildBody(provider),
+        child: Column(
+          children: [
+            TextField(
+              controller: _searchController,
+              onChanged: (v) => setState(() => _searchQuery = v),
+              style: const TextStyle(color: AppColors.white),
+              decoration: InputDecoration(
+                hintText: 'Search guest name or ID...',
+                hintStyle: const TextStyle(color: AppColors.greyText),
+                prefixIcon: const Icon(Icons.search, color: AppColors.greyText),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.close, color: AppColors.greyText),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: AppColors.surfaceBlack,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(child: _buildBody(provider)),
+          ],
+        ),
       ),
     );
   }
@@ -70,12 +111,22 @@ class _GuestsScreenState extends State<GuestsScreen> {
         );
 
       case GuestStatus.loaded:
-        final guests = provider.guests;
+        final query = _searchQuery.trim().toLowerCase();
+        final guests = query.isEmpty
+            ? provider.guests
+            : provider.guests
+                .where((g) =>
+                    g.mName.toLowerCase().contains(query) ||
+                    g.mid.toLowerCase().contains(query))
+                .toList();
+
         if (guests.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
-              'No guests at this table.',
-              style: TextStyle(color: AppColors.greyText),
+              query.isEmpty
+                  ? 'No guests at this table.'
+                  : 'No guests match "$_searchQuery".',
+              style: const TextStyle(color: AppColors.greyText),
             ),
           );
         }
@@ -151,19 +202,79 @@ class _GuestAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     const double size = 56;
 
-    if (guest.image != null) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.memory(
-          guest.image!,
-          width: size,
-          height: size,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => _fallback(),
+    final image = guest.image;
+    if (image == null) return _fallback();
+
+    return GestureDetector(
+      onTap: () => _showFullImage(context, image),
+      child: Hero(
+        tag: 'guest-avatar-${guest.mid}',
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.memory(
+            image,
+            width: size,
+            height: size,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => _fallback(),
+          ),
         ),
-      );
-    }
-    return _fallback();
+      ),
+    );
+  }
+
+  void _showFullImage(BuildContext context, Uint8List image) {
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (dialogContext) => GestureDetector(
+        onTap: () => Navigator.of(dialogContext).pop(),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: Hero(
+                  tag: 'guest-avatar-${guest.mid}',
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: InteractiveViewer(
+                      maxScale: 4,
+                      child: Image.memory(
+                        image,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) =>
+                            _fallback(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                guest.mName,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                guest.mid,
+                style: const TextStyle(
+                  color: AppColors.greyText,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _fallback() {

@@ -17,12 +17,21 @@ class TablesScreen extends StatefulWidget {
 }
 
 class _TablesScreenState extends State<TablesScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TableProvider>().loadTables(widget.pitName);
     });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -35,7 +44,37 @@ class _TablesScreenState extends State<TablesScreen> {
       showDrawer: false,
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: _buildBody(provider),
+        child: Column(
+          children: [
+            TextField(
+              controller: _searchController,
+              onChanged: (v) => setState(() => _searchQuery = v),
+              style: const TextStyle(color: AppColors.white),
+              decoration: InputDecoration(
+                hintText: 'Search table...',
+                hintStyle: const TextStyle(color: AppColors.greyText),
+                prefixIcon: const Icon(Icons.search, color: AppColors.greyText),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.close, color: AppColors.greyText),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: AppColors.surfaceBlack,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(child: _buildBody(provider)),
+          ],
+        ),
       ),
     );
   }
@@ -71,12 +110,20 @@ class _TablesScreenState extends State<TablesScreen> {
         );
 
       case TableStatus.loaded:
-        final tables = provider.tables;
+        final query = _searchQuery.trim().toLowerCase();
+        final tables = query.isEmpty
+            ? provider.tables
+            : provider.tables
+                .where((t) => t.tblCode.toLowerCase().contains(query))
+                .toList();
+
         if (tables.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
-              'No tables found for this pit.',
-              style: TextStyle(color: AppColors.greyText),
+              query.isEmpty
+                  ? 'No tables found for this pit.'
+                  : 'No tables match "$_searchQuery".',
+              style: const TextStyle(color: AppColors.greyText),
             ),
           );
         }
